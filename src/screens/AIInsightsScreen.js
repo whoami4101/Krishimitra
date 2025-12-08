@@ -1,10 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../context/LanguageContext';
+import { fetchSatelliteData } from '../services/satelliteService';
 
 export default function AIInsightsScreen() {
   const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState('insights');
+  const [satelliteData, setSatelliteData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'satellite') {
+      loadSatelliteData();
+    }
+  }, [activeTab]);
+
+  const loadSatelliteData = async () => {
+    setLoading(true);
+    const data = await fetchSatelliteData('omprakash');
+    console.log('Satellite data:', data);
+    setSatelliteData(data);
+    setLoading(false);
+  };
   const insights = [
     {
       id: 1,
@@ -94,39 +112,103 @@ export default function AIInsightsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('aiInsights')}</Text>
         <Text style={styles.subtitle}>{t('smartRecommendations')}</Text>
+        
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'insights' && styles.activeTab]}
+            onPress={() => setActiveTab('insights')}
+          >
+            <Ionicons name="bulb" size={20} color={activeTab === 'insights' ? '#4CAF50' : '#666'} />
+            <Text style={[styles.tabText, activeTab === 'insights' && styles.activeTabText]}>AI Insights</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'satellite' && styles.activeTab]}
+            onPress={() => setActiveTab('satellite')}
+          >
+            <Ionicons name="satellite" size={20} color={activeTab === 'satellite' ? '#4CAF50' : '#666'} />
+            <Text style={[styles.tabText, activeTab === 'satellite' && styles.activeTabText]}>Satellite Data</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.insightsList}>
-        {insights.map((insight) => (
-          <View key={insight.id} style={[styles.insightCard, { borderLeftColor: insight.color }]}>
-            <View style={styles.cardHeader}>
-              <View style={styles.iconContainer}>
-                <Ionicons name={insight.icon} size={24} color={insight.color} />
+      {activeTab === 'insights' ? (
+        <ScrollView style={styles.content}>
+
+          <View style={styles.insightsList}>
+            {insights.map((insight) => (
+              <View key={insight.id} style={[styles.insightCard, { borderLeftColor: insight.color }]}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.iconContainer}>
+                    <Ionicons name={insight.icon} size={24} color={insight.color} />
+                  </View>
+                  <View style={styles.statusContainer}>
+                    <Ionicons
+                      name={getStatusIcon(insight.status)}
+                      size={20}
+                      color={insight.color}
+                    />
+                  </View>
+                </View>
+                
+                <Text style={styles.insightTitle}>{insight.title}</Text>
+                <Text style={styles.insightMessage}>{insight.message}</Text>
+                
+                <View style={styles.recommendationContainer}>
+                  <Text style={styles.recommendationLabel}>{t('recommendation')}:</Text>
+                  <Text style={styles.recommendationText}>{insight.recommendation}</Text>
+                </View>
               </View>
-              <View style={styles.statusContainer}>
-                <Ionicons
-                  name={getStatusIcon(insight.status)}
-                  size={20}
-                  color={insight.color}
-                />
-              </View>
-            </View>
-            
-            <Text style={styles.insightTitle}>{insight.title}</Text>
-            <Text style={styles.insightMessage}>{insight.message}</Text>
-            
-            <View style={styles.recommendationContainer}>
-              <Text style={styles.recommendationLabel}>{t('recommendation')}:</Text>
-              <Text style={styles.recommendationText}>{insight.recommendation}</Text>
-            </View>
+            ))}
           </View>
-        ))}
-      </View>
-    </ScrollView>
+        </ScrollView>
+      ) : (
+        <ScrollView style={styles.content}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#4CAF50" />
+            </View>
+          ) : satelliteData ? (
+            <View style={styles.satelliteContainer}>
+              {satelliteData.error && (
+                <View style={styles.warningBanner}>
+                  <Ionicons name="warning" size={20} color="#FF9800" />
+                  <Text style={styles.warningText}>Demo Data - Configure polygon ID for real satellite data</Text>
+                </View>
+              )}
+              <View style={styles.satelliteCard}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="leaf" size={24} color="#4CAF50" />
+                  <Text style={styles.satelliteTitle}>Crop Health (NDVI)</Text>
+                </View>
+                <Text style={styles.satelliteValue}>{satelliteData.ndvi.toFixed(3)}</Text>
+                <Text style={styles.satelliteStatus}>{satelliteData.cropHealth}</Text>
+              </View>
+
+              <View style={styles.satelliteCard}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="analytics" size={24} color="#2196F3" />
+                  <Text style={styles.satelliteTitle}>Canopy Cover</Text>
+                </View>
+                <Text style={styles.satelliteValue}>{satelliteData.canopyCover}%</Text>
+              </View>
+
+              {satelliteData.imageUrl && (
+                <View style={styles.satelliteCard}>
+                  <Text style={styles.satelliteTitle}>Satellite Image</Text>
+                  <Image source={{ uri: satelliteData.imageUrl }} style={styles.satelliteImage} />
+                  <Text style={styles.lastUpdated}>Last Updated: {satelliteData.lastUpdated}</Text>
+                </View>
+              )}
+            </View>
+          ) : null}
+        </ScrollView>
+      )}
+    </View>
   );
 }
 
@@ -139,6 +221,37 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     paddingTop: 50,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: 15,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 10,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 8,
+  },
+  activeTab: {
+    backgroundColor: 'white',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  activeTabText: {
+    color: '#4CAF50',
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
@@ -207,5 +320,68 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#333',
     lineHeight: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 50,
+  },
+  warningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3E0',
+    padding: 15,
+    margin: 15,
+    borderRadius: 10,
+    gap: 10,
+  },
+  warningText: {
+    flex: 1,
+    color: '#E65100',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  satelliteContainer: {
+    padding: 15,
+  },
+  satelliteCard: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  satelliteTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
+  satelliteValue: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginTop: 15,
+  },
+  satelliteStatus: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 5,
+  },
+  satelliteImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginTop: 15,
+  },
+  lastUpdated: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });

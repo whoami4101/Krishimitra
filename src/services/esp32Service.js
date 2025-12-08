@@ -43,8 +43,6 @@ export const fetchESP32Data = async () => {
           };
         }
       } catch (error) {
-        console.log(`Attempt ${attempt}/${RETRY_ATTEMPTS} failed for ${endpoint}:`, error.message);
-        
         if (attempt < RETRY_ATTEMPTS) {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
         }
@@ -53,7 +51,6 @@ export const fetchESP32Data = async () => {
   }
   
   // Return 0 values if not connected to ESP32
-  console.log('All connections failed');
   return {
     temperature: 0,
     humidity: 0,

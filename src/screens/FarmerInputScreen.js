@@ -1,235 +1,178 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { useLanguage } from '../context/LanguageContext';
+import { analyzePestDisease } from '../services/pestDetectionService';
 
 export default function FarmerInputScreen() {
-  const { t } = useLanguage();
   const [image, setImage] = useState(null);
-  const [cropType, setCropType] = useState('');
-  const [location, setLocation] = useState('');
-  const [issue, setIssue] = useState('');
-  const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please grant gallery access');
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.8,
     });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+    if (!pickerResult.canceled) {
+      setImage(pickerResult.assets[0].uri);
+      analyzeImage(pickerResult.assets[0].uri);
     }
   };
 
   const takePhoto = async () => {
-    const result = await ImagePicker.launchCameraAsync({
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission needed', 'Please grant camera access');
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.8,
     });
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+    if (!pickerResult.canceled) {
+      setImage(pickerResult.assets[0].uri);
+      analyzeImage(pickerResult.assets[0].uri);
     }
   };
 
-  const handleSubmit = () => {
-    if (!image || !cropType || !issue) {
-      Alert.alert(t('missingInfo'), t('addImageCrop'));
-      return;
+  const analyzeImage = async (uri) => {
+    setLoading(true);
+    setResult(null);
+    try {
+      const analysis = await analyzePestDisease(uri);
+      setResult(analysis);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to analyze image');
     }
-    Alert.alert(t('success'), t('submitSuccess'));
-    // Reset form
-    setImage(null);
-    setCropType('');
-    setLocation('');
-    setIssue('');
-    setNotes('');
+    setLoading(false);
+  };
+
+  const getSeverityColor = (severity) => {
+    switch (severity) {
+      case 'high': return '#F44336';
+      case 'medium': return '#FF9800';
+      case 'low': return '#4CAF50';
+      default: return '#666';
+    }
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="leaf" size={32} color="#4CAF50" />
-        <Text style={styles.title}>{t('farmerInput')}</Text>
+        <Text style={styles.title}>Pest & Disease Detection</Text>
+        <Text style={styles.subtitle}>AI-powered crop health analysis</Text>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('uploadImage')} *</Text>
-        <View style={styles.imageContainer}>
-          {image ? (
-            <Image source={{ uri: image }} style={styles.image} />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Ionicons name="image-outline" size={64} color="#ccc" />
-              <Text style={styles.placeholderText}>{t('noImage')}</Text>
+      <ScrollView style={styles.content}>
+        {!image ? (
+          <View style={styles.uploadContainer}>
+            <Ionicons name="leaf-outline" size={80} color="#4CAF50" />
+            <Text style={styles.uploadText}>Upload or capture a plant image</Text>
+            
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={takePhoto}>
+                <Ionicons name="camera" size={24} color="white" />
+                <Text style={styles.buttonText}>Take Photo</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={pickImage}>
+                <Ionicons name="images" size={24} color="#4CAF50" />
+                <Text style={[styles.buttonText, styles.secondaryButtonText]}>Choose from Gallery</Text>
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.imageButton} onPress={takePhoto}>
-            <Ionicons name="camera" size={20} color="#fff" />
-            <Text style={styles.imageButtonText}>{t('takePhoto')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-            <Ionicons name="images" size={20} color="#fff" />
-            <Text style={styles.imageButtonText}>{t('chooseGallery')}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('cropType')} *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('cropPlaceholder')}
-          value={cropType}
-          onChangeText={setCropType}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('location')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('locationPlaceholder')}
-          value={location}
-          onChangeText={setLocation}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('issue')} *</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder={t('issuePlaceholder')}
-          value={issue}
-          onChangeText={setIssue}
-          multiline
-          numberOfLines={4}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>{t('notes')}</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder={t('notesPlaceholder')}
-          value={notes}
-          onChangeText={setNotes}
-          multiline
-          numberOfLines={3}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>{t('submit')}</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          </View>
+        ) : (
+          <View style={styles.resultContainer}>
+            <Image source={{ uri: image }} style={styles.image} />
+            
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#4CAF50" />
+                <Text style={styles.loadingText}>Analyzing image...</Text>
+              </View>
+            ) : result ? (
+              <View style={styles.analysisContainer}>
+                <View style={[styles.resultCard, { borderLeftColor: getSeverityColor(result.severity) }]}>
+                  <View style={styles.resultHeader}>
+                    <Ionicons name={result.detected ? "alert-circle" : "checkmark-circle"} 
+                              size={32} color={getSeverityColor(result.severity)} />
+                    <Text style={styles.resultTitle}>{result.name}</Text>
+                  </View>
+                  
+                  <Text style={styles.confidence}>Confidence: {result.confidence}%</Text>
+                  <Text style={styles.description}>{result.description}</Text>
+                  
+                  {result.detected && (
+                    <>
+                      <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Symptoms:</Text>
+                        {result.symptoms.map((symptom, idx) => (
+                          <Text key={idx} style={styles.listItem}>• {symptom}</Text>
+                        ))}
+                      </View>
+                      
+                      <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Treatment:</Text>
+                        {result.treatment.map((step, idx) => (
+                          <Text key={idx} style={styles.listItem}>• {step}</Text>
+                        ))}
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+            ) : null}
+            
+            <TouchableOpacity style={styles.retryButton} onPress={() => { setImage(null); setResult(null); }}>
+              <Ionicons name="refresh" size={20} color="white" />
+              <Text style={styles.retryText}>Analyze Another Image</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    color: '#333',
-  },
-  section: {
-    backgroundColor: '#fff',
-    padding: 15,
-    marginTop: 10,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fafafa',
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  imageContainer: {
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  image: {
-    width: '100%',
-    height: 250,
-    borderRadius: 8,
-  },
-  imagePlaceholder: {
-    width: '100%',
-    height: 250,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
-  },
-  placeholderText: {
-    marginTop: 10,
-    color: '#999',
-    fontSize: 14,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  imageButton: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#4CAF50',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 5,
-  },
-  imageButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    marginLeft: 8,
-    fontSize: 14,
-  },
-  submitButton: {
-    backgroundColor: '#4CAF50',
-    padding: 16,
-    borderRadius: 8,
-    margin: 20,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  container: { flex: 1, backgroundColor: '#F5F5F5' },
+  header: { backgroundColor: 'white', padding: 20, paddingTop: 50 },
+  title: { fontSize: 24, fontWeight: 'bold' },
+  subtitle: { fontSize: 16, color: '#666', marginTop: 5 },
+  content: { flex: 1 },
+  uploadContainer: { alignItems: 'center', padding: 40, marginTop: 60 },
+  uploadText: { fontSize: 18, color: '#666', marginTop: 20, marginBottom: 30 },
+  buttonContainer: { width: '100%', gap: 15 },
+  button: { backgroundColor: '#4CAF50', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 15, borderRadius: 10, gap: 10 },
+  secondaryButton: { backgroundColor: 'white', borderWidth: 2, borderColor: '#4CAF50' },
+  buttonText: { color: 'white', fontSize: 16, fontWeight: '600' },
+  secondaryButtonText: { color: '#4CAF50' },
+  resultContainer: { padding: 15 },
+  image: { width: '100%', height: 300, borderRadius: 15, marginBottom: 20 },
+  loadingContainer: { alignItems: 'center', padding: 30 },
+  loadingText: { marginTop: 10, color: '#666' },
+  analysisContainer: { marginBottom: 20 },
+  resultCard: { backgroundColor: 'white', borderRadius: 15, padding: 20, borderLeftWidth: 4 },
+  resultHeader: { flexDirection: 'row', alignItems: 'center', gap: 15, marginBottom: 10 },
+  resultTitle: { fontSize: 20, fontWeight: 'bold', flex: 1 },
+  confidence: { fontSize: 14, color: '#666', marginBottom: 10 },
+  description: { fontSize: 16, color: '#333', marginBottom: 15 },
+  section: { marginTop: 15 },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
+  listItem: { fontSize: 14, color: '#666', marginBottom: 5, paddingLeft: 10 },
+  retryButton: { backgroundColor: '#4CAF50', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 15, borderRadius: 10, gap: 10 },
+  retryText: { color: 'white', fontSize: 16, fontWeight: '600' },
 });
