@@ -1,9 +1,9 @@
 // ESP32 WiFi Service
 const ESP32_IP = '192.168.4.1';
 const API_ENDPOINTS = [
+  `http://${ESP32_IP}/api/sensor-data`,
   `http://${ESP32_IP}/sensor`,
   `http://${ESP32_IP}/data`,
-  `http://${ESP32_IP}/api/sensor-data`,
 ];
 
 const fetchWithTimeout = (url, timeout = 5000) => {
@@ -19,21 +19,22 @@ export const fetchESP32Data = async () => {
   // Try each endpoint
   for (const endpoint of API_ENDPOINTS) {
     try {
-      const response = await fetchWithTimeout(endpoint, 3000);
+      const response = await fetchWithTimeout(endpoint, 1000);
       
       if (response.ok) {
         const data = await response.json();
         
         // Map ESP32 data to app format
         return {
-          temperature: data.temperature || data.temp || 25,
-          humidity: data.humidity || data.hum || 60,
-          soilMoisture: data.soilMoisture || data.moisture || data.soil || 45,
+          temperature: data.temperature || data.temp || 0,
+          humidity: data.humidity || data.hum || 0,
+          soilMoisture: data.soilMoisture || data.moisture || data.soil || 0,
           lightIntensity: 0,
           phLevel: 0,
           nitrogen: 0,
           phosphorus: 0,
           potassium: 0,
+          connected: true,
         };
       }
     } catch (error) {
@@ -52,13 +53,14 @@ export const fetchESP32Data = async () => {
     nitrogen: 0,
     phosphorus: 0,
     potassium: 0,
+    connected: false,
   };
 };
 
 export const checkESP32Connection = async () => {
   for (const endpoint of API_ENDPOINTS) {
     try {
-      const response = await fetchWithTimeout(endpoint, 2000);
+      const response = await fetchWithTimeout(endpoint, 1000);
       if (response.ok) return true;
     } catch (error) {
       continue;

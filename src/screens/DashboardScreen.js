@@ -18,6 +18,7 @@ export default function DashboardScreen() {
     phosphorus: 42,
     potassium: 68,
     phLevel: 6.8,
+    connected: false,
   });
 
   const [insights, setInsights] = useState([
@@ -100,7 +101,7 @@ export default function DashboardScreen() {
 
   useEffect(() => {
     onRefresh();
-    const interval = setInterval(onRefresh, 10000); // Auto-refresh every 10 seconds
+    const interval = setInterval(onRefresh, 1000); // Auto-refresh every 1 second
     return () => clearInterval(interval);
   }, []);
 
@@ -110,8 +111,16 @@ export default function DashboardScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <Text style={styles.farmName}>{t('myFarm')}</Text>
-        <Text style={styles.cropType}>{t('wheatCrop')}</Text>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.farmName}>{t('myFarm')}</Text>
+            <Text style={styles.cropType}>{t('wheatCrop')}</Text>
+          </View>
+          <View style={[styles.statusBadge, { backgroundColor: sensorData.connected ? '#4CAF50' : '#F44336' }]}>
+            <View style={[styles.statusDot, { backgroundColor: sensorData.connected ? '#fff' : '#fff' }]} />
+            <Text style={styles.statusText}>{sensorData.connected ? 'Connected' : 'Disconnected'}</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.sensorGrid}>
@@ -189,6 +198,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     padding: 20,
     paddingTop: 50,
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  statusText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
   },
   farmName: {
     fontSize: 24,
