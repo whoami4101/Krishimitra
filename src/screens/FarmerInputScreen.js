@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function FarmerInputScreen() {
+  const { t } = useLanguage();
   const [image, setImage] = useState(null);
   const [cropType, setCropType] = useState('');
   const [location, setLocation] = useState('');
@@ -37,10 +39,10 @@ export default function FarmerInputScreen() {
 
   const handleSubmit = () => {
     if (!image || !cropType || !issue) {
-      Alert.alert('Missing Information', 'Please add an image, crop type, and issue description.');
+      Alert.alert(t('missingInfo'), t('addImageCrop'));
       return;
     }
-    Alert.alert('Success', 'Your input has been submitted successfully!');
+    Alert.alert(t('success'), t('submitSuccess'));
     // Reset form
     setImage(null);
     setCropType('');
@@ -53,58 +55,58 @@ export default function FarmerInputScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="leaf" size={32} color="#4CAF50" />
-        <Text style={styles.title}>Farmer Input</Text>
+        <Text style={styles.title}>{t('farmerInput')}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Upload Image *</Text>
+        <Text style={styles.label}>{t('uploadImage')} *</Text>
         <View style={styles.imageContainer}>
           {image ? (
             <Image source={{ uri: image }} style={styles.image} />
           ) : (
             <View style={styles.imagePlaceholder}>
               <Ionicons name="image-outline" size={64} color="#ccc" />
-              <Text style={styles.placeholderText}>No image selected</Text>
+              <Text style={styles.placeholderText}>{t('noImage')}</Text>
             </View>
           )}
         </View>
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.imageButton} onPress={takePhoto}>
             <Ionicons name="camera" size={20} color="#fff" />
-            <Text style={styles.imageButtonText}>Take Photo</Text>
+            <Text style={styles.imageButtonText}>{t('takePhoto')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
             <Ionicons name="images" size={20} color="#fff" />
-            <Text style={styles.imageButtonText}>Choose from Gallery</Text>
+            <Text style={styles.imageButtonText}>{t('chooseGallery')}</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Crop Type *</Text>
+        <Text style={styles.label}>{t('cropType')} *</Text>
         <TextInput
           style={styles.input}
-          placeholder="e.g., Wheat, Rice, Maize"
+          placeholder={t('cropPlaceholder')}
           value={cropType}
           onChangeText={setCropType}
         />
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Location</Text>
+        <Text style={styles.label}>{t('location')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Field location or area"
+          placeholder={t('locationPlaceholder')}
           value={location}
           onChangeText={setLocation}
         />
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Issue/Observation *</Text>
+        <Text style={styles.label}>{t('issue')} *</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Describe the issue or observation"
+          placeholder={t('issuePlaceholder')}
           value={issue}
           onChangeText={setIssue}
           multiline
@@ -113,10 +115,10 @@ export default function FarmerInputScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Additional Notes</Text>
+        <Text style={styles.label}>{t('notes')}</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Any additional information"
+          placeholder={t('notesPlaceholder')}
           value={notes}
           onChangeText={setNotes}
           multiline
@@ -125,7 +127,7 @@ export default function FarmerInputScreen() {
       </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit</Text>
+        <Text style={styles.submitButtonText}>{t('submit')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

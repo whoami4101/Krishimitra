@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../context/LanguageContext';
+import { languages } from '../utils/i18n';
+import { useNavigation } from '@react-navigation/native';
 
 export default function SettingsScreen() {
+  const navigation = useNavigation();
+  const { language, setLanguage, t } = useLanguage();
   const [notifications, setNotifications] = useState(true);
   const [selectedCrop, setSelectedCrop] = useState('Wheat');
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [soilThreshold, setSoilThreshold] = useState(30);
 
   const crops = ['Wheat', 'Rice', 'Maize', 'Cotton', 'Sugarcane', 'Soybean'];
-  const languages = ['English', 'Hindi', 'Marathi', 'Gujarati', 'Punjabi'];
 
   const showCropSelector = () => {
     Alert.alert(
@@ -23,14 +26,7 @@ export default function SettingsScreen() {
   };
 
   const showLanguageSelector = () => {
-    Alert.alert(
-      'Select Language',
-      'Choose your preferred language',
-      languages.map(lang => ({
-        text: lang,
-        onPress: () => setSelectedLanguage(lang),
-      }))
-    );
+    navigation.navigate('LanguageSelection');
   };
 
   const showThresholdSelector = () => {
@@ -62,7 +58,7 @@ export default function SettingsScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>{t('settings')}</Text>
         <Text style={styles.subtitle}>Customize your farming experience</Text>
       </View>
 
@@ -71,14 +67,14 @@ export default function SettingsScreen() {
         
         <SettingItem
           icon="leaf"
-          title="Crop Type"
+          title={t('cropType')}
           subtitle={selectedCrop}
           onPress={showCropSelector}
         />
         
         <SettingItem
           icon="water"
-          title="Soil Moisture Threshold"
+          title={t('threshold')}
           subtitle={`${soilThreshold}% - Alert when below this level`}
           onPress={showThresholdSelector}
         />
@@ -89,7 +85,7 @@ export default function SettingsScreen() {
         
         <SettingItem
           icon="notifications"
-          title="Push Notifications"
+          title={t('notifications')}
           subtitle="Receive alerts for critical conditions"
           rightComponent={
             <Switch
@@ -107,8 +103,8 @@ export default function SettingsScreen() {
         
         <SettingItem
           icon="language"
-          title="Language"
-          subtitle={selectedLanguage}
+          title={t('language')}
+          subtitle={languages.find(l => l.code === language)?.nativeName}
           onPress={showLanguageSelector}
         />
       </View>

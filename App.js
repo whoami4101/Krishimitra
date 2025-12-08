@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
+import { LanguageProvider } from './src/context/LanguageContext';
 
 import SplashScreen from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
@@ -14,6 +15,8 @@ import AIInsightsScreen from './src/screens/AIInsightsScreen';
 import ForecastScreen from './src/screens/ForecastScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import FarmerInputScreen from './src/screens/FarmerInputScreen';
+import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
+import { useLanguage } from './src/context/LanguageContext';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -27,6 +30,7 @@ Notifications.setNotificationHandler({
 });
 
 function MainTabs() {
+  const { t } = useLanguage();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -49,12 +53,12 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="History" component={HistoryScreen} />
-      <Tab.Screen name="AI Insights" component={AIInsightsScreen} />
-      <Tab.Screen name="Forecast" component={ForecastScreen} />
-      <Tab.Screen name="Farmer Input" component={FarmerInputScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ title: t('dashboard') }} />
+      <Tab.Screen name="History" component={HistoryScreen} options={{ title: t('history') }} />
+      <Tab.Screen name="AI Insights" component={AIInsightsScreen} options={{ title: t('aiInsights') }} />
+      <Tab.Screen name="Forecast" component={ForecastScreen} options={{ title: t('forecast') }} />
+      <Tab.Screen name="Farmer Input" component={FarmerInputScreen} options={{ title: t('farmerInput') }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t('settings') }} />
     </Tab.Navigator>
   );
 }
@@ -79,7 +83,8 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
+    <LanguageProvider>
+      <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {showOnboarding && (
           <Stack.Screen name="Onboarding">
@@ -92,7 +97,9 @@ export default function App() {
           </Stack.Screen>
         )}
         <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
+    </LanguageProvider>
   );
 }
