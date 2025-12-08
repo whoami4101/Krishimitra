@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AIInsightsScreen() {
+  const { t } = useLanguage();
   const insights = [
     {
       id: 1,
@@ -94,8 +96,8 @@ export default function AIInsightsScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>AI Insights</Text>
-        <Text style={styles.subtitle}>Smart recommendations for your farm</Text>
+        <Text style={styles.title}>{t('aiInsights')}</Text>
+        <Text style={styles.subtitle}>{t('smartRecommendations')}</Text>
       </View>
 
       <View style={styles.insightsList}>
@@ -118,7 +120,7 @@ export default function AIInsightsScreen() {
             <Text style={styles.insightMessage}>{insight.message}</Text>
             
             <View style={styles.recommendationContainer}>
-              <Text style={styles.recommendationLabel}>Recommendation:</Text>
+              <Text style={styles.recommendationLabel}>{t('recommendation')}:</Text>
               <Text style={styles.recommendationText}>{insight.recommendation}</Text>
             </View>
           </View>

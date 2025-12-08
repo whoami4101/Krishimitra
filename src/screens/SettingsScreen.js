@@ -9,20 +9,14 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const { language, setLanguage, t } = useLanguage();
   const [notifications, setNotifications] = useState(true);
-  const [selectedCrop, setSelectedCrop] = useState('Wheat');
+  const [selectedCrop, setSelectedCrop] = useState('wheat');
   const [soilThreshold, setSoilThreshold] = useState(30);
 
-  const crops = ['Wheat', 'Rice', 'Maize', 'Cotton', 'Sugarcane', 'Soybean'];
-
   const showCropSelector = () => {
-    Alert.alert(
-      'Select Crop Type',
-      'Choose your primary crop',
-      crops.map(crop => ({
-        text: crop,
-        onPress: () => setSelectedCrop(crop),
-      }))
-    );
+    navigation.navigate('CropSelection', {
+      selectedCrop,
+      onSelect: (crop) => setSelectedCrop(crop),
+    });
   };
 
   const showLanguageSelector = () => {
@@ -59,16 +53,16 @@ export default function SettingsScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('settings')}</Text>
-        <Text style={styles.subtitle}>Customize your farming experience</Text>
+        <Text style={styles.subtitle}>{t('customizeExp')}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Farm Configuration</Text>
+        <Text style={styles.sectionTitle}>{t('farmConfig')}</Text>
         
         <SettingItem
           icon="leaf"
           title={t('cropType')}
-          subtitle={selectedCrop}
+          subtitle={t(selectedCrop)}
           onPress={showCropSelector}
         />
         
@@ -81,12 +75,12 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
+        <Text style={styles.sectionTitle}>{t('notifications')}</Text>
         
         <SettingItem
           icon="notifications"
           title={t('notifications')}
-          subtitle="Receive alerts for critical conditions"
+          subtitle={t('receiveAlerts')}
           rightComponent={
             <Switch
               value={notifications}
@@ -99,7 +93,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Preferences</Text>
+        <Text style={styles.sectionTitle}>{t('preferences')}</Text>
         
         <SettingItem
           icon="language"
@@ -110,27 +104,27 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Support</Text>
+        <Text style={styles.sectionTitle}>{t('support')}</Text>
         
         <SettingItem
           icon="help-circle"
-          title="Help & FAQ"
-          subtitle="Get help with using KrishiMitra"
-          onPress={() => Alert.alert('Help', 'Help documentation coming soon!')}
+          title={t('helpFaq')}
+          subtitle={t('getHelp')}
+          onPress={() => Alert.alert(t('helpFaq'), 'Help documentation coming soon!')}
         />
         
         <SettingItem
           icon="mail"
-          title="Contact Support"
-          subtitle="Get in touch with our team"
-          onPress={() => Alert.alert('Contact', 'Email: support@krishimitra.com')}
+          title={t('contactSupport')}
+          subtitle={t('getInTouch')}
+          onPress={() => Alert.alert(t('contactSupport'), 'Email: support@krishimitra.com')}
         />
         
         <SettingItem
           icon="information-circle"
-          title="About KrishiMitra"
-          subtitle="Version 1.0.0"
-          onPress={() => Alert.alert('About', 'KrishiMitra - Smart Farming Companion\nVersion 1.0.0\n\nDeveloped for farmers to monitor and optimize their crops using IoT sensors and AI insights.')}
+          title={t('about')}
+          subtitle={t('version')}
+          onPress={() => Alert.alert(t('about'), 'KrishiMitra - Smart Farming Companion\n' + t('version') + '\n\nDeveloped for farmers to monitor and optimize their crops using IoT sensors and AI insights.')}
         />
       </View>
     </ScrollView>

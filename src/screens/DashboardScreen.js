@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native
 import { Ionicons } from '@expo/vector-icons';
 import SensorCard from '../components/SensorCard';
 import InsightCard from '../components/InsightCard';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function DashboardScreen() {
+  const { t } = useLanguage();
   const [refreshing, setRefreshing] = useState(false);
   const [sensorData, setSensorData] = useState({
     soilMoisture: 45,
@@ -58,55 +60,55 @@ export default function DashboardScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <Text style={styles.farmName}>My Farm</Text>
-        <Text style={styles.cropType}>Wheat Crop</Text>
+        <Text style={styles.farmName}>{t('myFarm')}</Text>
+        <Text style={styles.cropType}>{t('wheatCrop')}</Text>
       </View>
 
       <View style={styles.sensorGrid}>
         <SensorCard
-          title="Soil Moisture"
+          title={t('soilMoisture')}
           value={`${sensorData.soilMoisture}%`}
           icon="water"
           color="#2196F3"
         />
         <SensorCard
-          title="Temperature"
+          title={t('temperature')}
           value={`${sensorData.temperature}°C`}
           icon="thermometer"
           color="#FF5722"
         />
         <SensorCard
-          title="Humidity"
+          title={t('humidity')}
           value={`${sensorData.humidity}%`}
           icon="cloud"
           color="#9C27B0"
         />
         <SensorCard
-          title="Light Intensity"
+          title={t('lightIntensity')}
           value={`${sensorData.lightIntensity}%`}
           icon="sunny"
           color="#FFC107"
         />
         <SensorCard
-          title="pH Level"
+          title={t('phLevel')}
           value={sensorData.phLevel}
           icon="flask"
           color="#9C27B0"
         />
         <SensorCard
-          title="Nitrogen (N)"
+          title={t('nitrogen')}
           value={`${sensorData.nitrogen} ppm`}
           icon="leaf"
           color="#4CAF50"
         />
         <SensorCard
-          title="Phosphorus (P)"
+          title={t('phosphorus')}
           value={`${sensorData.phosphorus} ppm`}
           icon="flash"
           color="#FF9800"
         />
         <SensorCard
-          title="Potassium (K)"
+          title={t('potassium')}
           value={`${sensorData.potassium} ppm`}
           icon="fitness"
           color="#795548"
@@ -114,7 +116,7 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.insightsSection}>
-        <Text style={styles.sectionTitle}>AI Quick Insights</Text>
+        <Text style={styles.sectionTitle}>{t('quickInsights')}</Text>
         {insights.map((insight) => (
           <InsightCard key={insight.id} insight={insight} />
         ))}

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../context/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
 export default function HistoryScreen() {
+  const { t } = useLanguage();
   const [selectedFilter, setSelectedFilter] = useState('7days');
 
   const chartData = {
@@ -37,15 +39,15 @@ export default function HistoryScreen() {
   };
 
   const filters = [
-    { key: 'today', label: 'Today' },
-    { key: '7days', label: 'Last 7 days' },
-    { key: '30days', label: 'Last 30 days' },
+    { key: 'today', label: t('today') },
+    { key: '7days', label: t('last7days') },
+    { key: '30days', label: t('last30days') },
   ];
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Historical Data</Text>
+        <Text style={styles.title}>{t('historicalData')}</Text>
         <TouchableOpacity style={styles.exportButton}>
           <Ionicons name="share" size={20} color="#4CAF50" />
         </TouchableOpacity>
@@ -74,7 +76,7 @@ export default function HistoryScreen() {
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Soil Moisture (%)</Text>
+        <Text style={styles.chartTitle}>{t('soilMoisture')} (%)</Text>
         <LineChart
           data={chartData}
           width={width - 30}
@@ -86,7 +88,7 @@ export default function HistoryScreen() {
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Temperature (°C)</Text>
+        <Text style={styles.chartTitle}>{t('temperature')} (°C)</Text>
         <LineChart
           data={{
             ...chartData,
@@ -107,7 +109,7 @@ export default function HistoryScreen() {
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>pH Level</Text>
+        <Text style={styles.chartTitle}>{t('phLevel')}</Text>
         <LineChart
           data={{
             ...chartData,
@@ -128,7 +130,7 @@ export default function HistoryScreen() {
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Nitrogen (N) - ppm</Text>
+        <Text style={styles.chartTitle}>{t('nitrogen')} - ppm</Text>
         <LineChart
           data={{
             ...chartData,
@@ -149,7 +151,7 @@ export default function HistoryScreen() {
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Phosphorus (P) - ppm</Text>
+        <Text style={styles.chartTitle}>{t('phosphorus')} - ppm</Text>
         <LineChart
           data={{
             ...chartData,
@@ -170,7 +172,7 @@ export default function HistoryScreen() {
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Potassium (K) - ppm</Text>
+        <Text style={styles.chartTitle}>{t('potassium')} - ppm</Text>
         <LineChart
           data={{
             ...chartData,

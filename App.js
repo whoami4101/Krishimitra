@@ -16,6 +16,7 @@ import ForecastScreen from './src/screens/ForecastScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import FarmerInputScreen from './src/screens/FarmerInputScreen';
 import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
+import CropSelectionScreen from './src/screens/CropSelectionScreen';
 import { useLanguage } from './src/context/LanguageContext';
 
 const Stack = createStackNavigator();
@@ -98,6 +99,7 @@ export default function App() {
         )}
         <Stack.Screen name="Main" component={MainTabs} />
         <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CropSelection" component={CropSelectionScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </LanguageProvider>

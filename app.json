@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.krishimitra.app"
+      "bundleIdentifier": "com.krishimitra.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "KrishiMitra needs your location to provide accurate weather forecasts for your farm."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -37,7 +40,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "KrishiMitra needs your location to provide accurate weather forecasts for your farm."
+        }
+      ]
     ]
   }
 }

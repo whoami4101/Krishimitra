@@ -1,15 +1,64 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { weatherService } from '../services/weatherService';
+import { getLocation } from '../config/weather.config';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ForecastScreen() {
-  const weatherForecast = [
-    { day: 'Today', temp: '28°C', humidity: '65%', rain: '10%', icon: 'partly-sunny' },
-    { day: 'Tomorrow', temp: '30°C', humidity: '70%', rain: '40%', icon: 'cloudy' },
-    { day: 'Day 3', temp: '26°C', humidity: '80%', rain: '80%', icon: 'rainy' },
-    { day: 'Day 4', temp: '25°C', humidity: '75%', rain: '60%', icon: 'rainy' },
-    { day: 'Day 5', temp: '29°C', humidity: '60%', rain: '20%', icon: 'sunny' },
-  ];
+  const { t } = useLanguage();
+  const [weatherForecast, setWeatherForecast] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [locationName, setLocationName] = useState('');
+
+  const getWeatherIcon = (iconCode) => {
+    const iconMap = {
+      '01d': 'sunny', '01n': 'moon',
+      '02d': 'partly-sunny', '02n': 'cloudy-night',
+      '03d': 'cloudy', '03n': 'cloudy',
+      '04d': 'cloudy', '04n': 'cloudy',
+      '09d': 'rainy', '09n': 'rainy',
+      '10d': 'rainy', '10n': 'rainy',
+      '11d': 'thunderstorm', '11n': 'thunderstorm',
+      '13d': 'snow', '13n': 'snow',
+      '50d': 'cloudy', '50n': 'cloudy'
+    };
+    return iconMap[iconCode] || 'partly-sunny';
+  };
+
+  const fetchWeather = async () => {
+    try {
+      const { lat, lon, name } = await getLocation();
+      setLocationName(name);
+      const forecast = await weatherService.getForecast(lat, lon);
+      const formattedForecast = forecast.map((day, index) => ({
+        day: index === 0 ? t('today') : index === 1 ? t('tomorrow') : `${t('day')} ${index + 1}`,
+        temp: `${day.temp}°C`,
+        tempRange: `${day.tempMin}°-${day.tempMax}°C`,
+        humidity: `${day.humidity}%`,
+        rain: `${day.rainfall}mm`,
+        wind: `${day.windSpeed} m/s`,
+        icon: getWeatherIcon(day.icon),
+        description: day.description
+      }));
+      setWeatherForecast(formattedForecast);
+    } catch (error) {
+      console.error('Failed to fetch weather:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWeather();
+  }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchWeather();
+  };
 
   const pestAlerts = [
     {
@@ -44,15 +93,31 @@ export default function ForecastScreen() {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+        <Text style={styles.loadingText}>{t('loadingWeather')}</Text>
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    >
       <View style={styles.header}>
-        <Text style={styles.title}>Weather & Pest Forecast</Text>
-        <Text style={styles.subtitle}>5-day predictions</Text>
+        <Text style={styles.title}>{t('weatherPestForecast')}</Text>
+        <View style={styles.locationRow}>
+          <Ionicons name="location" size={16} color="#4CAF50" />
+          <Text style={styles.locationText}>{locationName}</Text>
+        </View>
+        <Text style={styles.subtitle}>{t('fiveDayPredictions')}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Weather Forecast</Text>
+        <Text style={styles.sectionTitle}>{t('weatherForecast')}</Text>
         {weatherForecast.map((weather, index) => (
           <View key={index} style={styles.weatherCard}>
             <View style={styles.weatherDay}>
@@ -72,13 +137,17 @@ export default function ForecastScreen() {
                 <Ionicons name="rainy" size={16} color="#9C27B0" />
                 <Text style={styles.weatherText}>{weather.rain}</Text>
               </View>
+              <View style={styles.weatherItem}>
+                <Ionicons name="speedometer" size={16} color="#607D8B" />
+                <Text style={styles.weatherText}>{weather.wind}</Text>
+              </View>
             </View>
           </View>
         ))}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Pest Alert Section</Text>
+        <Text style={styles.sectionTitle}>{t('pestAlertSection')}</Text>
         {pestAlerts.map((alert) => (
           <View key={alert.id} style={[styles.pestCard, { borderLeftColor: alert.color }]}>
             <View style={styles.pestHeader}>
@@ -103,6 +172,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
   header: {
     backgroundColor: 'white',
     padding: 20,
@@ -111,6 +189,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  locationText: {
+    fontSize: 16,
+    color: '#4CAF50',
+    fontWeight: '600',
+    marginLeft: 5,
   },
   subtitle: {
     fontSize: 16,
