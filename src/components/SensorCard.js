@@ -5,14 +5,17 @@ import { Ionicons } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 45) / 2;
 
-export default function SensorCard({ title, value, icon, color }) {
+export default function SensorCard({ title, value, icon, color, unavailable = false }) {
   return (
-    <View style={[styles.card, { borderLeftColor: color }]}>
+    <View style={[styles.card, { borderLeftColor: color, opacity: unavailable ? 0.5 : 1 }]}>
       <View style={styles.header}>
         <Ionicons name={icon} size={24} color={color} />
         <Text style={styles.title}>{title}</Text>
       </View>
       <Text style={[styles.value, { color }]}>{value}</Text>
+      {unavailable && (
+        <Text style={styles.unavailableText}>Sensor N/A</Text>
+      )}
     </View>
   );
 }
@@ -45,5 +48,11 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  unavailableText: {
+    fontSize: 10,
+    color: '#999',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 });

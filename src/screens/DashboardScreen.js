@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import SensorCard from '../components/SensorCard';
 import InsightCard from '../components/InsightCard';
 import { useLanguage } from '../context/LanguageContext';
+import { fetchESP32Data } from '../services/esp32Service';
 
 export default function DashboardScreen() {
   const { t } = useLanguage();
@@ -36,23 +37,72 @@ export default function DashboardScreen() {
     },
   ]);
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    // Simulate data refresh
-    setTimeout(() => {
-      setSensorData({
-        soilMoisture: Math.floor(Math.random() * 100),
-        temperature: Math.floor(Math.random() * 15) + 20,
-        humidity: Math.floor(Math.random() * 40) + 40,
-        lightIntensity: Math.floor(Math.random() * 50) + 50,
-        nitrogen: Math.floor(Math.random() * 40) + 60,
-        phosphorus: Math.floor(Math.random() * 30) + 30,
-        potassium: Math.floor(Math.random() * 40) + 50,
-        phLevel: (Math.random() * 2 + 6).toFixed(1),
-      });
+    try {
+      const data = await fetchESP32Data();
+      setSensorData(data);
+      
+      // Update insights based on real data
+      const newInsights = [];
+      
+      if (data.soilMoisture < 30) {
+        newInsights.push({
+          id: 1,
+          type: 'critical',
+          message: `Soil moisture at ${data.soilMoisture}% - Irrigation needed urgently`,
+          icon: 'water',
+          color: '#F44336',
+        });
+      } else if (data.soilMoisture < 50) {
+        newInsights.push({
+          id: 1,
+          type: 'warning',
+          message: `Soil moisture at ${data.soilMoisture}% - Consider irrigation`,
+          icon: 'water',
+          color: '#FF9800',
+        });
+      } else {
+        newInsights.push({
+          id: 1,
+          type: 'good',
+          message: `Soil moisture at ${data.soilMoisture}% - Optimal level`,
+          icon: 'water',
+          color: '#4CAF50',
+        });
+      }
+      
+      if (data.temperature > 35) {
+        newInsights.push({
+          id: 2,
+          type: 'warning',
+          message: `Temperature at ${data.temperature}°C - High temperature alert`,
+          icon: 'thermometer',
+          color: '#FF9800',
+        });
+      } else {
+        newInsights.push({
+          id: 2,
+          type: 'good',
+          message: `Temperature at ${data.temperature}°C - Normal range`,
+          icon: 'thermometer',
+          color: '#4CAF50',
+        });
+      }
+      
+      setInsights(newInsights);
+    } catch (error) {
+      console.log('Using simulated data');
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
+
+  useEffect(() => {
+    onRefresh();
+    const interval = setInterval(onRefresh, 10000); // Auto-refresh every 10 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <ScrollView
@@ -88,30 +138,35 @@ export default function DashboardScreen() {
           value={`${sensorData.lightIntensity}%`}
           icon="sunny"
           color="#FFC107"
+          unavailable={true}
         />
         <SensorCard
           title={t('phLevel')}
-          value={sensorData.phLevel}
+          value={sensorData.phLevel || '0'}
           icon="flask"
           color="#9C27B0"
+          unavailable={true}
         />
         <SensorCard
           title={t('nitrogen')}
           value={`${sensorData.nitrogen} ppm`}
           icon="leaf"
           color="#4CAF50"
+          unavailable={true}
         />
         <SensorCard
           title={t('phosphorus')}
           value={`${sensorData.phosphorus} ppm`}
           icon="flash"
           color="#FF9800"
+          unavailable={true}
         />
         <SensorCard
           title={t('potassium')}
           value={`${sensorData.potassium} ppm`}
           icon="fitness"
           color="#795548"
+          unavailable={true}
         />
       </View>
 

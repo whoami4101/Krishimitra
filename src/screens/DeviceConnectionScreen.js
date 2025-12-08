@@ -1,24 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { checkESP32Connection } from '../services/esp32Service';
 
 export default function DeviceConnectionScreen({ onConnect }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionMethod, setConnectionMethod] = useState(null);
 
-  const handleConnect = async (method) => {
-    setConnectionMethod(method);
+  const handleWiFiConnect = async () => {
+    setConnectionMethod('Wi-Fi');
+    setIsConnecting(true);
+
+    Alert.alert(
+      'Connect to ESP32 WiFi',
+      'Please connect to "ESP32-Farm-Dashboard" WiFi network.\n\nPassword: farm123456\n\nThen tap "Check Connection"',
+      [
+        { text: 'Open WiFi Settings', onPress: () => Linking.openSettings() },
+        { 
+          text: 'Check Connection', 
+          onPress: async () => {
+            const isConnected = await checkESP32Connection();
+            setIsConnecting(false);
+            
+            if (isConnected) {
+              Alert.alert(
+                'Connection Successful',
+                'Connected to ESP32 device via WiFi',
+                [{ text: 'OK', onPress: onConnect }]
+              );
+            } else {
+              Alert.alert(
+                'Connection Failed',
+                'Could not connect to ESP32. Please ensure you are connected to "ESP32-Farm-Dashboard" WiFi.',
+                [{ text: 'Retry', onPress: handleWiFiConnect }]
+              );
+            }
+          }
+        },
+        { text: 'Cancel', onPress: () => setIsConnecting(false), style: 'cancel' }
+      ]
+    );
+  };
+
+  const handleBluetoothConnect = async () => {
+    setConnectionMethod('Bluetooth');
     setIsConnecting(true);
     
-    // Simulate connection process
     setTimeout(() => {
       setIsConnecting(false);
-      Alert.alert(
-        'Connection Successful',
-        `Connected to KrishiMitra device via ${method}`,
-        [{ text: 'OK', onPress: onConnect }]
-      );
-    }, 3000);
+      onConnect();
+    }, 500);
   };
 
   return (
@@ -32,7 +63,7 @@ export default function DeviceConnectionScreen({ onConnect }) {
       <View style={styles.options}>
         <TouchableOpacity
           style={styles.optionButton}
-          onPress={() => handleConnect('Bluetooth')}
+          onPress={handleBluetoothConnect}
           disabled={isConnecting}
         >
           <Ionicons name="bluetooth" size={40} color="#2196F3" />
@@ -42,12 +73,12 @@ export default function DeviceConnectionScreen({ onConnect }) {
 
         <TouchableOpacity
           style={styles.optionButton}
-          onPress={() => handleConnect('Wi-Fi')}
+          onPress={handleWiFiConnect}
           disabled={isConnecting}
         >
           <Ionicons name="wifi" size={40} color="#FF9800" />
           <Text style={styles.optionText}>Connect via Wi-Fi</Text>
-          <Text style={styles.optionSubtext}>Hotspot Connection</Text>
+          <Text style={styles.optionSubtext}>ESP32-Farm-Dashboard</Text>
         </TouchableOpacity>
       </View>
 
@@ -62,13 +93,12 @@ export default function DeviceConnectionScreen({ onConnect }) {
         </View>
       )}
 
-      <TouchableOpacity
-        style={[styles.syncButton, { opacity: isConnecting ? 0.5 : 1 }]}
-        disabled={isConnecting}
-        onPress={() => handleConnect('Manual')}
-      >
-        <Text style={styles.syncButtonText}>Connect & Sync</Text>
-      </TouchableOpacity>
+      <View style={styles.instructions}>
+        <Text style={styles.instructionText}>WiFi Instructions:</Text>
+        <Text style={styles.instructionSubtext}>1. Select "Connect via Wi-Fi"</Text>
+        <Text style={styles.instructionSubtext}>2. Connect to "ESP32-Farm-Dashboard"</Text>
+        <Text style={styles.instructionSubtext}>3. Password: farm123456</Text>
+      </View>
     </View>
   );
 }
@@ -130,15 +160,22 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
-  syncButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: 'center',
+  instructions: {
+    backgroundColor: '#E3F2FD',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
   },
-  syncButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
+  instructionText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1976D2',
+    marginBottom: 10,
+  },
+  instructionSubtext: {
+    fontSize: 14,
+    color: '#424242',
+    marginLeft: 10,
+    marginTop: 5,
   },
 });

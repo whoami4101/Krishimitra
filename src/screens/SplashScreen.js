@@ -1,13 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function SplashScreen() {
   return (
     <LinearGradient colors={['#4CAF50', '#2E7D32']} style={styles.container}>
       <View style={styles.content}>
-        <Ionicons name="leaf" size={80} color="white" />
+        <Image source={require('../../logo.png')} style={styles.logo} />
         <Text style={styles.title}>KrishiMitra</Text>
         <Text style={styles.subtitle}>Your Smart Farming Companion</Text>
       </View>
@@ -23,6 +22,11 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 32,
