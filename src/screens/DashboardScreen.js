@@ -39,10 +39,12 @@ export default function DashboardScreen() {
   ]);
 
   const onRefresh = async () => {
-    setRefreshing(true);
     try {
       const data = await fetchESP32Data();
-      setSensorData(data);
+      setSensorData(prevData => ({
+        ...data,
+        connected: data.connected || prevData.connected
+      }));
       
       // Update insights based on real data
       const newInsights = [];
@@ -94,22 +96,17 @@ export default function DashboardScreen() {
       setInsights(newInsights);
     } catch (error) {
       console.log('Using simulated data');
-    } finally {
-      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     onRefresh();
-    const interval = setInterval(onRefresh, 1000); // Auto-refresh every 1 second
+    const interval = setInterval(onRefresh, 5000); // Auto-refresh every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <View>
