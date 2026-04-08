@@ -30,11 +30,14 @@ describe('satelliteService', () => {
       expect(result).toHaveProperty('cropHealth');
       expect(result).toHaveProperty('canopyCover');
       expect(result).toHaveProperty('lastUpdated');
+      expect(result.error).toContain('demo data');
     });
 
     it('returns demo data when polygonId is placeholder string', async () => {
       const result = await fetchSatelliteData('YOUR_POLYGON_ID');
 
+      expect(result).toHaveProperty('ndvi');
+      expect(result).toHaveProperty('cropHealth');
       expect(result.error).toContain('demo data');
     });
 

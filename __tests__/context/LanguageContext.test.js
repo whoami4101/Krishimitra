@@ -89,8 +89,8 @@ describe('LanguageContext', () => {
   });
 
   describe('useLanguage hook', () => {
-    it('throws or returns undefined when used outside provider', () => {
-      // useContext returns undefined when no provider is present
+    it('returns undefined when used outside a provider', () => {
+      // useContext returns undefined when no provider wraps the component
       let ctx;
       const Wrapper = () => {
         ctx = useLanguage();

@@ -75,6 +75,32 @@ describe('notifications utils', () => {
       expect(Notifications.requestPermissionsAsync).toHaveBeenCalledTimes(2);
       expect(Notifications.scheduleNotificationAsync).toHaveBeenCalledTimes(2);
     });
+
+    it('schedules morning notification at 8:00 with repeating trigger', async () => {
+      Notifications.requestPermissionsAsync.mockResolvedValue({ status: 'granted' });
+
+      scheduleFarmAlerts();
+      await new Promise(r => setTimeout(r, 0));
+
+      const calls = Notifications.scheduleNotificationAsync.mock.calls;
+      const morningCall = calls.find(([arg]) => arg.trigger && arg.trigger.hour === 8);
+      expect(morningCall).toBeDefined();
+      expect(morningCall[0].trigger).toEqual({ hour: 8, minute: 0, repeats: true });
+      expect(morningCall[0].content.title).toBe('Daily Farm Check');
+    });
+
+    it('schedules evening notification at 18:00 with repeating trigger', async () => {
+      Notifications.requestPermissionsAsync.mockResolvedValue({ status: 'granted' });
+
+      scheduleFarmAlerts();
+      await new Promise(r => setTimeout(r, 0));
+
+      const calls = Notifications.scheduleNotificationAsync.mock.calls;
+      const eveningCall = calls.find(([arg]) => arg.trigger && arg.trigger.hour === 18);
+      expect(eveningCall).toBeDefined();
+      expect(eveningCall[0].trigger).toEqual({ hour: 18, minute: 0, repeats: true });
+      expect(eveningCall[0].content.title).toBe('Farm Summary');
+    });
   });
 
   describe('sendMoistureAlert', () => {

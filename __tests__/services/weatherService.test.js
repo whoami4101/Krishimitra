@@ -105,11 +105,13 @@ describe('weatherService', () => {
 
       const result = await weatherService.getForecast(28.6139, 77.209);
 
-      // Today: temps [26, 28] -> avg = 27
-      const todayEntry = result.find(e => e.date === today.toLocaleDateString());
-      expect(todayEntry.temp).toBe(27);
-      expect(todayEntry.tempMin).toBe(26);
-      expect(todayEntry.tempMax).toBe(28);
+      // Today: temps [26, 28] -> avg = 27, min = 26, max = 28
+      // The service groups by toLocaleDateString(); we match by index (first group = today)
+      expect(result.length).toBeGreaterThanOrEqual(1);
+      const firstEntry = result[0];
+      expect(firstEntry.temp).toBe(27);
+      expect(firstEntry.tempMin).toBe(26);
+      expect(firstEntry.tempMax).toBe(28);
     });
 
     it('accumulates rain from items with rain data', async () => {
