@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiMitra - Smart Farming IoT Solution</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-seedling"></i>
+                <span>KrishiMitra</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#plans">Plans</a></li>
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Smart Farming Made Simple</h1>
+                <p>Monitor soil health, weather conditions, and crop growth with our advanced IoT devices</p>
+                <a href="#plans" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-thermometer-half"></i>
+                    </div>
+                    <h3>Temperature & Humidity</h3>
+                    <p>Real-time monitoring with DHT11 sensor for optimal crop conditions</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3>Soil Moisture</h3>
+                    <p>Track soil moisture levels to optimize irrigation schedules</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3>pH & NPK Sensors</h3>
+                    <p>Measure soil pH and nutrient levels for better crop yield</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Visual Monitoring</h3>
+                    <p>ESP32-CAM for remote crop surveillance and analysis</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Data Storage</h3>
+                    <p>Memory module for historical data tracking and insights</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-signal"></i>
+                    </div>
+                    <h3>GSM Connectivity</h3>
+                    <p>Stay connected anywhere with GSM module support</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subscription Plans Section -->
+    <section id="plans" class="plans">
+        <div class="container">
+            <h2 class="section-title">Subscription Plans</h2>
+            <p class="section-subtitle">Choose the perfect plan for your farming needs</p>
+            <div class="plans-grid">
+                <!-- Bronze Plan -->
+                <div class="plan-card">
+                    <div class="plan-header bronze">
+                        <i class="fas fa-medal"></i>
+                        <h3>Bronze</h3>
+                    </div>
+                    <div class="plan-body">
+                        <div class="plan-price">
+                            <span class="original-price">₹420.00</span>
+                            <div class="discounted-price">
+                                <span class="price-range">₹84 - ₹210</span>
+                                <span class="scheme-badge">PMDDKY Scheme</span>
+                            </div>
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> ESP-32 Module</li>
+                            <li><i class="fas fa-check"></i> DHT11 Sensor</li>
+                            <li><i class="fas fa-check"></i> Soil Moisture Sensor</li>
+                        </ul>
+                        <button class="btn btn-outline">Choose Plan</button>
+                    </div>
+                </div>
+
+                <!-- Silver Plan -->
+                <div class="plan-card">
+                    <div class="plan-header silver">
+                        <i class="fas fa-medal"></i>
+                        <h3>Silver</h3>
+                    </div>
+                    <div class="plan-body">
+                        <div class="plan-price">
+                            <span class="original-price">₹2,620.00</span>
+                            <div class="discounted-price">
+                                <span class="price-range">₹524 - ₹1,310</span>
+                                <span class="scheme-badge">PMDDKY Scheme</span>
+                            </div>
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> ESP-32 Module</li>
+                            <li><i class="fas fa-check"></i> DHT11 Sensor</li>
+                            <li><i class="fas fa-check"></i> Soil Moisture Sensor</li>
+                            <li><i class="fas fa-check"></i> PH Sensor</li>
+                            <li><i class="fas fa-check"></i> NPK Sensor</li>
+                        </ul>
+                        <button class="btn btn-outline">Choose Plan</button>
+                    </div>
+                </div>
+
+                <!-- Gold Plan -->
+                <div class="plan-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="plan-header gold">
+                        <i class="fas fa-medal"></i>
+                        <h3>Gold</h3>
+                    </div>
+                    <div class="plan-body">
+                        <div class="plan-price">
+                            <span class="original-price">₹3,170.00</span>
+                            <div class="discounted-price">
+                                <span class="price-range">₹634 - ₹1,585</span>
+                                <span class="scheme-badge">PMDDKY Scheme</span>
+                            </div>
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> ESP-32 Module</li>
+                            <li><i class="fas fa-check"></i> DHT11 Sensor</li>
+                            <li><i class="fas fa-check"></i> Soil Moisture Sensor</li>
+                            <li><i class="fas fa-check"></i> PH Sensor</li>
+                            <li><i class="fas fa-check"></i> NPK Sensor</li>
+                            <li><i class="fas fa-check"></i> Memory Module</li>
+                            <li><i class="fas fa-check"></i> ESP32-CAM</li>
+                        </ul>
+                        <button class="btn btn-primary">Choose Plan</button>
+                    </div>
+                </div>
+
+                <!-- Diamond Plan -->
+                <div class="plan-card">
+                    <div class="plan-header diamond">
+                        <i class="fas fa-gem"></i>
+                        <h3>Diamond</h3>
+                    </div>
+                    <div class="plan-body">
+                        <div class="plan-price">
+                            <span class="original-price">₹3,540.00</span>
+                            <div class="discounted-price">
+                                <span class="price-range">₹708 - ₹1,770</span>
+                                <span class="scheme-badge">PMDDKY Scheme</span>
+                            </div>
+                        </div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> ESP-32 Module</li>
+                            <li><i class="fas fa-check"></i> DHT11 Sensor</li>
+                            <li><i class="fas fa-check"></i> Soil Moisture Sensor</li>
+                            <li><i class="fas fa-check"></i> PH Sensor</li>
+                            <li><i class="fas fa-check"></i> NPK Sensor</li>
+                            <li><i class="fas fa-check"></i> Memory Module</li>
+                            <li><i class="fas fa-check"></i> ESP32-CAM</li>
+                            <li><i class="fas fa-check"></i> GSM Module</li>
+                        </ul>
+                        <button class="btn btn-outline">Choose Plan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+        <div class="container">
+            <h2 class="section-title">Download Our App</h2>
+            <p class="section-subtitle">Monitor your farm from anywhere, anytime</p>
+            <div class="download-buttons">
+                <a href="#" class="download-btn">
+                    <i class="fab fa-google-play"></i>
+                    <div>
+                        <span>Get it on</span>
+                        <strong>Google Play</strong>
+                    </div>
+                </a>
+                <a href="#" class="download-btn">
+                    <i class="fab fa-apple"></i>
+                    <div>
+                        <span>Download on the</span>
+                        <strong>App Store</strong>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <i class="fas fa-seedling"></i>
+                    <span>KrishiMitra</span>
+                </div>
+                <p>&copy; 2024 KrishiMitra. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
