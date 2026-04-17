@@ -4,10 +4,10 @@
     "slug": "krishimitra",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./logo.png",
+    "icon": "./app_code/logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./logo.png",
+      "image": "./app_code/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#4CAF50"
     },
@@ -23,7 +23,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./logo.png",
+        "foregroundImage": "./app_code/logo.png",
         "backgroundColor": "#4CAF50"
       },
       "package": "com.krishimitra.app",
@@ -37,7 +37,7 @@
       ]
     },
     "web": {
-      "favicon": "./logo.png"
+      "favicon": "./app_code/logo.png"
     },
     "plugins": [
       "expo-notifications",
